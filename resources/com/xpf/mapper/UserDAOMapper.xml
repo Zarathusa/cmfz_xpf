@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.xpf.dao.UserDAO"> 
+	
+	<resultMap type="User" id="userResultMap">
+		<id column="u_id" property="id"/>
+		<result column="u_phone" property="phone"/>
+		<result column="u_password" property="password"/>
+		<result column="u_salt" property="salt"/>
+		<result column="u_head_img" property="head_img"/>
+		<result column="u_name" property="name"/>
+		<result column="u_legal_name" property="legal_name"/>
+		<result column="u_sex" property="sex"/>
+		<result column="u_city" property="city"/>
+		<result column="u_sign" property="sign"/>
+		<result column="u_status" property="status"/>
+		<result column="u_reg_date" property="reg_date"/>
+		<association property="guru" javaType="Guru">
+			<id column="g_id" property="id"/>
+			<result column="g_legal_name" property="legal_name"/>
+			<result column="g_head_img" property="head_img"/>
+			<result column="g_status" property="status"/>
+			<result column="g_reg_date" property="reg_date"/>
+		</association>
+	</resultMap>
+	
+	
+	<select id="queryAllByPage" resultMap="userResultMap">
+			SELECT
+			u.id AS u_id,
+			u.phone AS u_phone,
+			u.`password` AS u_password,
+			u.salt AS u_salt,
+			u.head_img AS u_head_img,
+			u.`name` AS u_name,
+			u.legal_name AS u_legal_name,
+			u.sex AS u_sex,
+			u.city AS u_city,
+			u.sign AS u_sign,
+			u.`status` AS u_status,
+			u.reg_date AS u_reg_date,
+			g.id AS g_id,
+			g.legal_name AS g_legal_name,
+			g.head_img AS g_head_img,
+			g.`status` AS g_status,
+			g.reg_date AS g_reg_date
+			FROM
+			`user` AS u
+			LEFT JOIN guru AS g ON u.guru_id= g.id
+			LIMIT #{begin}, #{end}
+	</select>
+	
+	<!-- 查询总条数 -->
+	<select id="getUserCount" resultType="java.lang.Integer">
+		select count(*) from user
+	</select>
+	
+	<!-- 更新状态 -->
+	<update id="modifyStatus">
+		update user set status=#{status} where id=#{id}
+	</update>
+	
+	
+	<!-- 通过UserId查询对象 -->
+	<select id="getGuruId" resultType="java.lang.Integer">
+		SELECT
+		`user`.guru_id
+		FROM
+		`user`
+		WHERE
+		id =#{id}
+	</select>
+	
+	<!--  查询所有用户 -->
+	<select id="queryAll" resultType="User">
+		SELECT
+		`user`.id,
+		`user`.phone,
+		`user`.`password`,
+		`user`.salt,
+		`user`.head_img,
+		`user`.`name`,
+		`user`.legal_name,
+		`user`.sex,
+		`user`.city,
+		`user`.sign,
+		`user`.`status`,
+		`user`.reg_date
+		FROM
+		`user`
+	</select>
+	
+	
+	<!-- 通过性别查询月份的注册人数 -->
+	<select id="queryRegDateBySex" resultType="Month">
+		select 
+		sum(case month(reg_date) when '1' then 1 else 0 end) as jan,
+		sum(case month(reg_date) when '2' then 1 else 0 end) as feb,
+		sum(case month(reg_date) when '3' then 1 else 0 end) as mar,
+		sum(case month(reg_date) when '4' then 1 else 0 end) as apr,
+		sum(case month(reg_date) when '5' then 1 else 0 end) as may,
+		sum(case month(reg_date) when '6' then 1 else 0 end) as jun,
+		sum(case month(reg_date) when '7' then 1 else 0 end) as jul,
+		sum(case month(reg_date) when '8' then 1 else 0 end) as aug,
+		sum(case month(reg_date) when '9' then 1 else 0 end) as sept,
+		sum(case month(reg_date) when '10' then 1 else 0 end) as oct,
+		sum(case month(reg_date) when '11' then 1 else 0 end) as nov,
+		sum(case month(reg_date) when '12' then 1 else 0 end) as 'dec'
+		from user
+		where sex=#{sex}
+	</select>
+	
+	
+	<!-- 通过季度查询地区的注册数量 -->
+	<select id="queryCityRegCountByQuarter" resultType="City">
+		select city as name,count(*) as 'value' FROM user 
+		WHERE QUARTER(reg_date)=#{quarter}
+		GROUP BY city
+	</select>
+	
+	
+	<!-- 前端接口：用户注册 -->
+	<insert id="saveUser">
+		INSERT INTO `user` ( `phone`, `password`, `salt`, `head_img`, `name`, `legal_name`, `sex`, `city`, sign ,`status`, `reg_date`,guru_id) 
+		VALUES ( #{phone}, #{password}, 'QWER', '/picture/index1.jpg', #{name}, #{legal_name}, #{sex}, #{city},'sign', '1', now(),1)
+	</insert>
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.xpf.dao.MenuDAO"> 
+	
+	<resultMap type="Menu" id="menuResultMap">
+		<id column="p_id" property="id"/>
+		<result column="p_title" property="title"/>
+		<result column="p_iconCls" property="iconCls"/>
+		<collection property="children" ofType="Menu">
+			<id column="c_id" property="id"/>
+			<result column="c_title" property="title"/>
+			<result column="c_href" property="href"/>
+			<result column="c_iconCls" property="iconCls"/>
+		</collection>
+	</resultMap>
+	
+	<select id="queryAll" resultMap="menuResultMap">
+		select p.id as p_id,p.title as p_title,p.iconCls as p_iconCls,
+		c.id as c_id,c.title as c_title,c.href as c_href ,c.iconCls as c_iconCls 
+		from menu p join menu c
+		on p.id = c.parentId
+		  
+	</select>
+</mapper>

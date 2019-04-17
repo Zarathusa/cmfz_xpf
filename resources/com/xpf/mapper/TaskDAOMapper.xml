@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.xpf.dao.TaskDAO"> 
+
+	<resultMap type="Task" id="TaskResultMap">
+		<id column="t_id" property="id"/>
+		<result column="t_title" property="title"/>
+		<result column="t_mark" property="mark"/>
+		<result column="t_pub_date" property="pub_date"/>
+		<association property="user" javaType="User">
+			<id column="u_id" property="id"/>
+			<result column="u_phone" property="phone"/>
+			<result column="u_name" property="name"/>
+			<result column="u_legal_name" property="legal_name"/>
+			<result column="u_legal_status" property="legal_status"/>
+		</association>
+		<collection property="counters" ofType="Counter">
+			<id column="c_id" property="id"/>
+			<result column="c_title" property="title"/>
+			<result column="c_last_date" property="last_date"/>
+			<result column="c_count" property="count"/>
+		</collection>
+		
+	</resultMap>
+
+	<select id="queryAllTaskByPage" resultMap="TaskResultMap">
+		SELECT
+		t.id AS t_id,
+		t.title AS t_title,
+		t.mark AS t_mark,
+		t.pub_date AS t_pub_date,
+		c.id AS c_id,
+		c.title AS c_title,
+		c.last_date AS c_last_date,
+		c.count AS c_count,
+		u.id AS u_id,
+		u.phone AS u_phone,
+		u.`name` AS u_name,
+		u.legal_name AS u_legal_name,
+		u.`status` AS u_status
+		FROM
+		task AS t
+		 JOIN counter AS c ON t.id= c.task_id
+		 JOIN `user` AS u ON c.user_id= u.id
+		LIMIT #{begin},#{end}
+		
+	</select>
+	
+	<select id="getTaskCount" resultType="java.lang.Integer">
+		select count(*) from task
+	</select>
+</mapper>

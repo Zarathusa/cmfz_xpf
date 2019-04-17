@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.xpf.dao.AlbumDAO"> 
+
+	<resultMap type="Album" id="AlbumResultMap">
+		<id column="a_id" property="id"/>
+		<result column="a_title" property="title"/>
+		<result column="a_score" property="score"/>
+		<result column="a_author" property="author"/>
+		<result column="a_img_path" property="img_path"/>
+		<result column="a_beam" property="beam"/>
+		<result column="a_count" property="count"/>
+		<result column="a_content" property="content"/>
+		<result column="a_pub_date" property="pub_date"/>
+		<collection property="children" ofType="Chapter">
+			<id column="c_id" property="id"/>
+			<result column="c_title" property="title"/>
+			<result column="c_size" property="size"/>
+			<result column="c_url" property="url"/>
+			<result column="c_duration" property="duration"/>
+			<result column="c_pub_date" property="pub_date"/>
+		</collection>
+		
+	</resultMap>
+	
+	<!-- 专辑表和章节表连接  -->
+	<select id="queryAllByPage" resultMap="AlbumResultMap">
+			SELECT
+			a.id AS a_id,
+			a.title AS a_title,
+			a.score AS a_score,
+			a.author AS a_author,
+			a.img_path AS a_img_path,
+			a.beam AS a_beam,
+			a.count AS a_count,
+			a.content AS a_content,
+			a.pub_date AS a_pub_date,
+			c.id AS c_id,
+			c.title AS c_title,
+			c.size AS c_size,
+			c.url AS c_url,
+			c.duration AS c_duration,
+			c.pub_date AS c_pub_date
+			FROM
+			album AS a
+			LEFT JOIN chapter AS c ON a.id= c.album_id
+			LIMIT #{begin}, #{end}
+	</select>
+	
+	<select id="getCount" resultType="java.lang.Integer">
+		select count(*) from album
+	</select>
+	
+	<!-- 添加专辑 -->
+	<insert id="add">
+		insert into album(title,score,author,img_path,beam,count,content,pub_date) 
+		values(#{title},#{score},#{author},#{img_path},#{beam},0,#{content},now())
+	</insert>
+	
+	
+	<!-- 添加章节后 count+1 -->
+	<update id="addCount">
+		update album set count=count+1 where id=#{id}
+	</update>
+	
+	<!-- 专辑按时间排序 只要前六个 -->
+	<select id="queryByDate" resultType="Album">
+		SELECT
+		album.id,
+		album.title,
+		album.score,
+		album.author,
+		album.img_path,
+		album.beam,
+		album.count,
+		album.content,
+		album.pub_date
+		FROM
+		album
+		ORDER BY
+		album.pub_date DESC
+		LIMIT 0, 6
+	</select>
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.xpf.dao.ArticleDAO"> 
+
+	<resultMap type="Article" id="ArticleResultMap">
+		<id column="a_id" property="id"/>
+		<result column="a_title" property="title"/>		
+		<result column="a_author" property="author"/>		
+		<result column="a_insert_img" property="insert_img"/>		
+		<result column="a_content" property="content"/>		
+		<result column="a_pub_date" property="pub_date"/>
+		<association property="guru" javaType="Guru">
+			<id column="g_id" property="id"/>
+			<result column="g_legal_name" property="legal_name"/>
+			<result column="g_head_img" property="head_img"/>
+			<result column="g_status" property="status"/>
+			<result column="g_reg_date" property="reg_date"/>
+		</association>		
+	</resultMap>
+	
+	<select id="queryAllByPage" resultMap="ArticleResultMap">
+		SELECT
+		a.id AS a_id,
+		a.title AS a_title,
+		a.author AS a_author,
+		a.insert_img AS a_insert_img,
+		a.content AS a_content,
+		a.pub_date AS a_pub_date,
+		g.id AS g_id,
+		g.legal_name AS g_legal_name,
+		g.head_img AS g_head_img,
+		g.`status` AS g_status,
+		g.reg_date AS g_reg_date
+		FROM
+		article AS a
+		LEFT JOIN guru AS g ON a.guru_id= g.id
+		<where>
+			<if test="likes!=null">
+			<bind name="likess" value="'%'+likes+'%'"/>
+				title like #{likess} or
+				author like #{likess} or
+				content like #{likess}
+			</if>
+		</where>
+		LIMIT #{begin}, #{end}
+	</select>
+	
+	<!-- 条数 -->
+	<select id="getArticleCount" resultType="java.lang.Integer">
+		select count(*) from article 
+		<where>
+			<if test="likes!=null">
+				<bind name="likess" value="'%'+likes+'%'"/>
+				title like #{likess} or
+				author like #{likess} or
+				content like #{likess}
+			</if>
+		</where>
+	</select>
+	
+	
+	<!-- 前端接口的文章展示 -->
+	<select id="queryAllByGuruId" resultType="Article">
+		SELECT
+		article.id,
+		article.title,
+		article.author,
+		article.insert_img,
+		article.content,
+		article.pub_date
+		FROM
+		article
+		<where>
+			<if test="guru_id!=null">
+				guru_id=#{guru_id}
+			</if>
+		</where>
+		ORDER BY
+		article.pub_date DESC
+	</select>
+</mapper>

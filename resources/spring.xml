@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"	
+	xmlns:tx="http://www.springframework.org/schema/tx"	
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context-3.2.xsd  
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-3.2.xsd  
+						">
+	
+	<!-- 包扫描 -->
+	<context:component-scan base-package="com.xpf">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>	
+			
+	<!-- 引入小配置文件 -->		
+	<context:property-placeholder location="classpath:com/xpf/conf/db.properties"/>
+	
+	<!-- 创建数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">  
+		<!-- 创建数据源 -->
+		<property name="driverClassName" value="${mysql.driver}"/>
+		<property name="url" value="${mysql.url}"/>
+		<property name="username" value="${mysql.username}"></property>
+		<property name="password" value="${mysql.password}"/>
+	</bean>
+	
+	<!-- 创建sqlSessionFactory -->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapperLocations" value="classpath:com/xpf/mapper/*Mapper.xml"/>
+		<property name="typeAliasesPackage" value="com.xpf.entity,com.xpf.pojo"/>
+	</bean>
+	
+	<!-- 创建DAO实现类 -->
+	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.xpf.dao"></property>
+	</bean>
+	
+	<!-- 创建事务管理器   id为transactionManager-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- 注解式事务生效 -->
+	<tx:annotation-driven />
+				
+</beans>

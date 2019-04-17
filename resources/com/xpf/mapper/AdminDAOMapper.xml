@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.xpf.dao.AdminDAO"> 
+	
+	<sql id="ADMIN">
+		id,username,password,level
+	</sql>
+	
+	<!-- 登录查询 -->
+	<select id="queryByUsernameAndPassword" resultType="Admin">
+		select <include refid="ADMIN"/> from admin where username=#{username} and password=#{password}
+	</select>
+	
+	<!-- 修改密码 -->
+	<update id="modifyPassword">
+		update admin set password=#{newPassword} where id=#{id} and password=#{password}
+	</update>
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>cmfz_xpf</display-name>
+  
+  	<!-- 指定spring的位置 -->
+  	<context-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>classpath:spring.xml</param-value>
+  	</context-param>
+  	
+  	<!-- 配置spring监听器，启动spring工厂 -->
+  	<listener>
+  		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  	</listener>
+  	
+  	<!-- 配置springmvc核心servlet -->
+  	<servlet>
+  		<servlet-name>springmvc</servlet-name>
+  		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  		<!-- 指定springmvc配置文件的位置 -->
+  		<init-param>
+  			<param-name>contextConfigLocation</param-name>
+  			<param-value>classpath:springmvc.xml</param-value>
+  		</init-param>
+  	</servlet>
+  	<servlet-mapping>
+  		<servlet-name>springmvc</servlet-name>
+  		<url-pattern>/</url-pattern>
+  	</servlet-mapping>
+  	
+  	<!-- 编码过滤器 -->
+  	<filter>
+  		<filter-name>charset</filter-name>
+  		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+  		<!-- 响应编码格式 -->
+  		<init-param>
+  			<param-name>encoding</param-name>
+  			<param-value>UTF-8</param-value>
+  		</init-param>
+  		<!-- 保证请求与响应编码一致 -->
+  		<init-param>
+  			<param-name>forceEncoding</param-name>
+  			<param-value>true</param-value>
+  		</init-param>
+  	</filter>
+  	<filter-mapping>
+  		<filter-name>charset</filter-name>
+  		<url-pattern>/*</url-pattern>
+  	</filter-mapping>
+  	
+  	<!-- 配置登录过滤器 -->
+  	<filter>
+  		<filter-name>LoginFilter</filter-name>
+  		<filter-class>com.xpf.filter.LoginFilter</filter-class>
+  	</filter>
+  	<filter-mapping>
+  		<filter-name>LoginFilter</filter-name>
+  		<url-pattern>/main/main.jsp</url-pattern>
+  	</filter-mapping>
+  	
+</web-app>
